@@ -1,5 +1,7 @@
 package org.bonitasoft.connect;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +34,7 @@ public class Connection {
         String action = args.length > 4 ? args[4] : null;
         logger.info("Connection url[" + url + "] Application[" + application + "] user[" + username + "] password[" + password + "]");
         try {
-            long beg= System.currentTimeMillis();
+            long beg = System.currentTimeMillis();
             final Map<String, String> map = new HashMap<String, String>();
             map.put("server.url", url);
             map.put("application.name", application);
@@ -43,8 +45,8 @@ public class Connection {
             final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
             // log in to the tenant to create a session
             final APISession session = loginAPI.login(username, password);
-            long end= System.currentTimeMillis();
-            logger.info("    *****************  Successful connection in "+(end-beg)+" ms ***************** ");
+            long end = System.currentTimeMillis();
+            logger.info("    *****************  Successful connection in " + (end - beg) + " ms ***************** ");
 
             if ("USERS".equalsIgnoreCase(action)) {
                 // get the identityAPI bound to the session created previously.
@@ -63,7 +65,12 @@ public class Connection {
 
             loginAPI.logout(session);
         } catch (final Exception e) {
-            logger.severe(" **************  ERROR during connection url[" + url + "] Application[" + application + "] user[" + username + "] password[" + password + "] : " + e.getMessage());
+
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            String exceptionDetails = sw.toString();
+
+            logger.severe(" **************  ERROR during connection url[" + url + "] Application[" + application + "] user[" + username + "] password[" + password + "] : " + e.getMessage()+" at "+exceptionDetails);
         }
     }
 
